@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: streammetrics-producer
+
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    producer:
+      # Serializers
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: com.backendbrilliance.streammetrics.serde.MetricEventSerializer
+
+      # Reliability settings
+      acks: all
+      retries: 2147483647  # Infinite retries
+      max-in-flight-requests-per-connection: 5
+      enable-idempotence: true
+
+      # Performance tuning
+      compression-type: snappy
+      batch-size: 32768  # 32KB
+      linger-ms: 10
+      buffer-memory: 67108864  # 64MB
+
+      # Timeout settings
+      request-timeout-ms: 30000
+      delivery-timeout-ms: 120000
+
+      # Additional properties
+      properties:
+        max.block.ms: 60000
+
+app:
+  kafka:
+    topic:
+      metrics-events: metrics-events
+      metrics-dead-letter: metrics-dead-letter
+
+resilience4j:
+  retry:
+    instances:
+      kafkaProducer:
+        max-attempts: 3
+        wait-duration: 1s
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - org.apache.kafka.common.errors.NetworkException
+          - org.apache.kafka.common.errors.TimeoutException
+        ignore-exceptions:
+          - org.apache.kafka.common.errors.SerializationException
+  circuitbreaker:
+    instances:
+      kafkaProducer:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.backendbrilliance: DEBUG
+    org.apache.kafka: INFO
