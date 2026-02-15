@@ -7,7 +7,7 @@ spring:
     producer:
       # Serializers
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: com.backendbrilliance.streammetrics.serde.MetricEventSerializer
+      value-serializer: org.backendbrilliance.streammetrics.serde.MetricEventSerializer
 
       # Reliability settings
       acks: all

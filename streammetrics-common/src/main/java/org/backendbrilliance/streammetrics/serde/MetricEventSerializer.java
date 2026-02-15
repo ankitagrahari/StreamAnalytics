@@ -6,8 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class MetricEventSerializer implements Serializer<MetricEvent> {
 
     private final ObjectMapper objectMapper;
