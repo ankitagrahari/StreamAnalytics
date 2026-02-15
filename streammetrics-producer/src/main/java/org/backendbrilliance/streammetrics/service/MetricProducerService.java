@@ -1,10 +1,10 @@
 package org.backendbrilliance.streammetrics.service;
 
-import org.backendbrilliance.streammetrics.model.MetricEvent;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.backendbrilliance.streammetrics.model.MetricEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -14,13 +14,17 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MetricProducerService {
 
     private final KafkaTemplate<String, MetricEvent> kafkaTemplate;
 
     @Value("${app.kafka.topic.metrics-events}")
     private String topic;
+
+    @Autowired
+    public MetricProducerService(KafkaTemplate<String, MetricEvent> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     /**
      * Sends a metric event to Kafka with retry and circuit breaker patterns

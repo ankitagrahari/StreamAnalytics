@@ -29,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @EmbeddedKafka(
         topics = {"metrics-events"},
-        partitions = 3,
-        brokerProperties = {
-                "listeners=PLAINTEXT://localhost:9999",
-                "port=9999"
-        }
+        partitions = 3
+//        brokerProperties = {
+//                "listeners=PLAINTEXT://localhost:9999",
+//                "port=9999"
+//        }
 )
 class MetricProducerServiceIntegrationTest {
 
