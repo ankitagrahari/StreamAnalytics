@@ -51,8 +51,7 @@ class MetricProducerServiceIntegrationTest {
         ContainerProperties containerProps = new ContainerProperties("metrics-events");
         containerProps.setMessageListener((MessageListener<String, MetricEvent>) records::add);
 
-        KafkaMessageListenerContainer<String, MetricEvent> container =
-                createContainer(containerProps);
+        KafkaMessageListenerContainer<String, MetricEvent> container = createContainer(containerProps);
         container.start();
 
         ContainerTestUtils.waitForAssignment(container,

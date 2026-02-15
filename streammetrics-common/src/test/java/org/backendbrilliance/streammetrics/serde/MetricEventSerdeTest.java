@@ -49,4 +49,23 @@ class MetricEventSerdeTest {
         assertNull(serializer.serialize("test-topic", null));
         assertNull(deserializer.deserialize("test-topic", null));
     }
+
+    @Test
+    void shouldSerializeAllMetricTypes() {
+        for (MetricType type : MetricType.values()) {
+            MetricEvent event = MetricEvent.create(
+                    "test-service",
+                    "test-pod",
+                    type,
+                    "test.metric",
+                    100.0,
+                    "ms"
+            );
+
+            byte[] serialized = serializer.serialize("test", event);
+            MetricEvent deserialized = deserializer.deserialize("test", serialized);
+
+            assertEquals(type, deserialized.getMetricType());
+        }
+    }
 }
