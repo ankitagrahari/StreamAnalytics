@@ -1,9 +1,10 @@
-package org.backendbrilliance.streammetrics.service;
+package org.backendbrilliance.streammetrics.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.backendbrilliance.streammetrics.model.MetricEvent;
 import org.backendbrilliance.streammetrics.model.MetricType;
+import org.backendbrilliance.streammetrics.service.MetricProducerService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +45,7 @@ public class TestMetricProducer implements CommandLineRunner {
         producerService.sendMetric(invalidEvent);
         Thread.sleep(1000);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10000; i++) {
             String serviceId = services[random.nextInt(services.length)];
             String endpoint = endpoints[random.nextInt(endpoints.length)];
             String method = methods[random.nextInt(methods.length)];

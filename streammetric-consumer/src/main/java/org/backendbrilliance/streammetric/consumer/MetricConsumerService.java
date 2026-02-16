@@ -1,11 +1,14 @@
 package org.backendbrilliance.streammetric.consumer;
 
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.Tracer;
 import org.backendbrilliance.streammetric.processor.MetricProcessor;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.backendbrilliance.streammetric.metrics.MetricCounter;
 import org.backendbrilliance.streammetrics.model.MetricEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -28,6 +32,8 @@ public class MetricConsumerService {
     private final Validator validator;
     private final KafkaTemplate<String, MetricEvent> deadLetterProducer;
     private final MetricProcessor metricProcessor;
+    private final Optional<Tracer> tracer;
+    private final MetricCounter metricCounter;
 
     @Value("${app.kafka.topic.metrics-events}")
     private String inputTopic;
@@ -51,13 +57,19 @@ public class MetricConsumerService {
         log.debug("Received metric: eventId={}, partition={}, offset={}",
                 event.getEventId(), partition, offset);
 
+        // Extract and continue trace
+        Span span = null;
+        if (event.getMetadata() != null && event.getMetadata().containsKey("traceId")) {
+            String traceId = event.getMetadata().get("traceId");
+            log.debug("Processing with traceId: {}", traceId);
+        }
+
         try {
             // Validate event
             Set<ConstraintViolation<MetricEvent>> violations = validator.validate(event);
             if (!violations.isEmpty()) {
                 String errorMsg = "Validation failed: " + violations;
-                log.error("Invalid metric event: eventId={}, errors={}",
-                        event.getEventId(), errorMsg);
+                log.error("Invalid metric event: eventId={}, errors={}", event.getEventId(), errorMsg);
                 sendToDeadLetterQueue(event, errorMsg, "VALIDATION_ERROR");
                 acknowledgment.acknowledge();
                 return;
@@ -65,7 +77,7 @@ public class MetricConsumerService {
 
             // Process metric
             metricProcessor.processMetrics(event);
-
+            metricCounter.incrementProcessed(event.getServiceId());
             // Manual commit after successful processing
             acknowledgment.acknowledge();
 
@@ -73,6 +85,7 @@ public class MetricConsumerService {
 
         } catch (Exception e) {
             log.error("Error processing metric: eventId={}", event.getEventId(), e);
+            metricCounter.incrementFailed(event.getServiceId(), "processing_error");
             sendToDeadLetterQueue(event, e.getMessage(), "PROCESSING_ERROR");
             acknowledgment.acknowledge();  // Still commit to avoid reprocessing
         }

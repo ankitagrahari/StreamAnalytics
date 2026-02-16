@@ -2,29 +2,30 @@ package org.backendbrilliance.streammetrics.service;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.tracing.Tracer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.backendbrilliance.streammetrics.model.MetricEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MetricProducerService {
 
     private final KafkaTemplate<String, MetricEvent> kafkaTemplate;
+    private final Optional<Tracer> tracer;
 
     @Value("${app.kafka.topic.metrics-events}")
     private String topic;
-
-    @Autowired
-    public MetricProducerService(KafkaTemplate<String, MetricEvent> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
 
     /**
      * Sends a metric event to Kafka with retry and circuit breaker patterns
@@ -41,6 +42,20 @@ public class MetricProducerService {
 
         log.debug("Sending metric event: eventId={}, serviceId={}, metricName={}",
                 event.getEventId(), event.getServiceId(), event.getMetricName());
+
+        // Add trace ID to event metadata
+        tracer.ifPresent(t -> {
+            if (t.currentSpan() != null) {
+                String traceId = Objects.requireNonNull(t.currentSpan()).context().traceId();
+                String spanId = Objects.requireNonNull(t.currentSpan()).context().spanId();
+
+                if (Objects.isNull(event.getMetadata())) {
+                    event.setMetadata(new HashMap<>());
+                }
+                event.getMetadata().put("traceId", traceId);
+                event.getMetadata().put("spanId", spanId);
+            }
+        });
 
         return kafkaTemplate
                 .send(topic, partitionKey, event)
