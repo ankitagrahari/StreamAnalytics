@@ -1,8 +1,5 @@
 HELP.md
 target/
-docker/kafka1
-docker/kafka2
-docker/kafka3
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -34,4 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-.DS_Store

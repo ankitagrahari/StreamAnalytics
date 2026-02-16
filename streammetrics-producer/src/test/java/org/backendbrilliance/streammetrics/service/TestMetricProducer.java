@@ -7,6 +7,7 @@ import org.backendbrilliance.streammetrics.model.MetricType;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -27,6 +28,21 @@ public class TestMetricProducer implements CommandLineRunner {
         String[] services = {"payment-service", "user-service", "order-service"};
         String[] endpoints = {"/api/v1/payments", "/api/v1/users", "/api/v1/orders"};
         String[] methods = {"GET", "POST", "PUT", "DELETE"};
+
+        MetricEvent invalidEvent = MetricEvent.builder()
+                .eventId("invalid-test-123")
+                .timestamp(Instant.now())
+                .serviceId(null)
+                .instanceId("test")
+                .metricType(MetricType.HTTP_REQUEST)
+                .metricName("test")
+                .value(-100.0)
+                .unit("ms")
+                .build();
+
+        log.warn("Sending INVALID event for testing...");
+        producerService.sendMetric(invalidEvent);
+        Thread.sleep(1000);
 
         for (int i = 0; i < 100; i++) {
             String serviceId = services[random.nextInt(services.length)];

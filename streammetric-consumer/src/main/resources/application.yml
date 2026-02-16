@@ -1,0 +1,64 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: streammetrics-consumer
+
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9094,localhost:9096
+
+    consumer:
+      group-id: streammetrics-processors
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.backendbrilliance.streammetrics.serde.MetricEventDeserializer
+
+      # Manual offset management
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+
+      # Performance
+      max-poll-records: 500
+      max-poll-interval-ms: 300000
+      session-timeout-ms: 10000
+      heartbeat-interval-ms: 3000
+
+      # Reliability
+      isolation-level: read_committed
+
+      properties:
+        partition.assignment.strategy: org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+
+    producer:
+      # For DLQ
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.backendbrilliance.streammetrics.serde.MetricEventSerializer
+      acks: all
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+
+app:
+  kafka:
+    topic:
+      metrics-events: metrics-events
+      metrics-dead-letter: metrics-dead-letter
+    consumer:
+      concurrency: 3  # 3 consumer threads
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.backendbrilliance: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.kafka: DEBUG

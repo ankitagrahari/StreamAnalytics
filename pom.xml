@@ -16,7 +16,7 @@
     <modules>
         <module>streammetrics-common</module>
         <module>streammetrics-producer</module>
-<!--        <module>streammetrics-consumer</module>-->
+        <module>streammetric-consumer</module>
 <!--        <module>streammetrics-load-generator</module>-->
     </modules>
 
