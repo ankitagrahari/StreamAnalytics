@@ -1,0 +1,25 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: streammetrics-loadgenerator
+
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9094,localhost:9096
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.backendbrilliance.streammetrics.serde.MetricEventSerializer
+
+      # Optimized for throughput
+      acks: 1  # Changed from 'all' - less safe but faster
+      compression-type: snappy
+      batch-size: 65536  # 64KB (larger batches)
+      linger-ms: 10
+      buffer-memory: 134217728  # 128MB
+      max-in-flight-requests-per-connection: 5
+
+logging:
+  level:
+    org.backendbrilliance: INFO
+    org.apache.kafka: WARN

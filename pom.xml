@@ -18,6 +18,7 @@
         <module>streammetrics-producer</module>
         <module>streammetric-consumer</module>
         <module>streammetric-streams</module>
+        <module>streammetrics-loadgenerator</module>
     </modules>
 
     <properties>
