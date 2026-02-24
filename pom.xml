@@ -19,6 +19,7 @@
         <module>streammetric-consumer</module>
         <module>streammetric-streams</module>
         <module>streammetrics-loadgenerator</module>
+        <module>streammetrics-integration-tests</module>
     </modules>
 
     <properties>

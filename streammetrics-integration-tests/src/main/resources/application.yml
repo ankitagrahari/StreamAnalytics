@@ -1,0 +1,41 @@
+
+spring:
+  application:
+    name: streammetrics-integration-tests
+
+  kafka:
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.backendbrilliance.streammetrics.serde.MetricEventSerializer
+      acks: all
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.backendbrilliance.streammetrics.serde.MetricEventDeserializer
+      group-id: test-consumer-group
+      auto-offset-reset: earliest
+
+    streams:
+      application-id: test-streams-app
+      properties:
+        num.stream.threads: 1
+        commit.interval.ms: 100
+        state.dir: ${java.io.tmpdir}/kafka-streams-test
+
+  redis:
+    host: localhost
+    port: 6379
+
+app:
+  kafka:
+    topics:
+      input: test-metrics-events
+      output-1m: test-metrics-aggregated-1m
+
+logging:
+  level:
+    org.backendbrilliance: DEBUG
+    org.apache.kafka: WARN
+    org.testcontainers: INFO
