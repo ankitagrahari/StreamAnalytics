@@ -1,15 +1,25 @@
 package org.backendbrilliance.streammetrics;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Testcontainers
 @SpringBootTest
@@ -18,34 +28,24 @@ import org.testcontainers.utility.DockerImageName;
 @EmbeddedKafka(
         partitions = 3,
         topics = {"test-metric-events", "test-metrics-aggregated-1m"},
-        brokerProperties = {
-//                "listeners=PLAINTEXT://localhost:9093",
-//                "port=9093",
-                "auto.create.topics.enable=true"
-        }
+        bootstrapServersProperty = "spring.kafka.bootstrap-servers",
+        brokerProperties = {"auto.create.topics.enable=true"}
 )
 public abstract class IntegrationTestBase {
 
-    protected static GenericContainer<?> redisContainer;
+    @Container      // Manages the Lifecycle of redis container
+    protected static GenericContainer<?> redisContainer = new GenericContainer<>(
+            DockerImageName.parse("redis:7-alpine"))
+            .withExposedPorts(6379);
 
-    @BeforeAll
-    static void startRedisContainer() {
-        redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
-                .withExposedPorts(6379)
-                .withReuse(true);
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        // Force the host to "127.0.0.1" to avoid localhost resolution issues
+        registry.add("spring.data.redis.host", redisContainer::getHost);
+        registry.add("spring.data.redis.port", () -> redisContainer.getMappedPort(6379));
 
-        redisContainer.start();
-
-        //Set Redis connection properties
-        System.setProperty("spring.redis.host", redisContainer.getHost());
-        System.setProperty("spring.redis.port", String.valueOf(redisContainer.getMappedPort(6379)));
+        // Also map older property keys just in case your version uses them
+        registry.add("spring.redis.host", redisContainer::getHost);
+        registry.add("spring.redis.port", ()->redisContainer.getMappedPort(6379));
     }
-
-    @AfterAll
-    static void stopRedisContainer() {
-        if(redisContainer!=null && redisContainer.isRunning()) {
-            redisContainer.stop();
-        }
-    }
-
 }
