@@ -1,0 +1,21 @@
+# 1. Send 100 events
+kubectl port-forward -n streammetrics svc/producer 8085:8085 &
+curl "http://localhost:8085/produce?events=100"
+
+# 2. Wait 10 seconds for processing
+sleep 10
+
+# 3. Check consumer processed events
+kubectl logs -n streammetrics deployment/consumer --tail=50 | grep "Successfully processed"
+
+# 4. Check streams aggregated data
+kubectl logs -n streammetrics deployment/streams --tail=50 | grep -i "aggregate\|processed"
+
+# 5. Check Redis has data
+kubectl exec -n streammetrics deployment/redis -- redis-cli KEYS "*"
+
+# 6. If Redis has data, check specific key
+kubectl exec -n streammetrics deployment/redis -- redis-cli KEYS "agg:1m:*"
+
+# 7. Test query API (if streams wrote aggregates)
+curl "http://localhost:8085/api/metrics/latest?service=payment-service&metric=api.request.duration"

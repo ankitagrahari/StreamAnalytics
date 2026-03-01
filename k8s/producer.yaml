@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: producer-config
+  namespace: streammetrics
+data:
+  application.yml: |
+    spring:
+      kafka:
+        bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+      redis:
+        host: redis
+        port: 6379
+    server:
+      port: 8085
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: producer
+  namespace: streammetrics
+spec:
+  type: NodePort
+  ports:
+    - port: 8085
+      targetPort: 8085
+      nodePort: 30085
+  selector:
+    app: producer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+  namespace: streammetrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+      - name: producer
+        image: streammetric-producer:latest
+        imagePullPolicy: Never  # Use local image
+        ports:
+        - containerPort: 8085
+        env:
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "streammetrics-kafka-kafka-bootstrap:9092"
+        - name: SPRING_REDIS_HOST
+          value: "redis"
+        - name: SPRING_REDIS_PORT
+          value: "6379"
+        - name: SERVER_PORT
+          value: "8085"
+        - name: SPRING_DATA_REDIS_CLIENT_TYPE 
+          value: "lettuce"
+        - name: MANAGEMENT_HEALTH_REDIS_ENABLED
+          value: "false"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8085
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8085
+          initialDelaySeconds: 30
+          periodSeconds: 5

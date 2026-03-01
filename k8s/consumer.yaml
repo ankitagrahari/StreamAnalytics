@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+  namespace: streammetrics
+spec:
+  replicas: 2  # Scale to 2 instances
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: streammetrics-consumer:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-Dspring.redis.host=redis -Dspring.redis.port=6379"
+        - name: SPRING_CONFIG_LOCATION
+          value: "classpath:/application.yml,/config/application.yml"
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: "streammetrics-kafka-kafka-bootstrap:9092"
+        - name: SPRING_REDIS_HOST
+          value: "redis"
+        - name: SPRING_REDIS_PORT
+          value: "6379"
+        - name: SERVER_PORT
+          value: "8081"
+        - name: SPRING_DATA_REDIS_CLIENT_TYPE
+          value: "lettuce"
+        - name: MANAGEMENT_HEALTH_REDIS_ENABLED
+          value: "false"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: consumer-config

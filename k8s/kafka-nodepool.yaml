@@ -1,0 +1,21 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: broker
+  namespace: streammetrics
+  labels:
+    strimzi.io/cluster: streammetrics-kafka
+spec:
+  replicas: 3
+  roles:
+    - broker
+    - controller  # KRaft mode: brokers are also controllers
+  storage:
+    type: ephemeral
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1000m

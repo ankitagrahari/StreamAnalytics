@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: streams-config
+  namespace: streammetrics
+data:
+  application.yml: |
+    spring:
+      kafka:
+        bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+      redis:
+        host: redis
+        port: 6379
+    server:
+      port: 8082

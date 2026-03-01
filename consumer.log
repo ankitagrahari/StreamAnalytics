@@ -1,0 +1,200 @@
+
+2026-03-01T02:21:46.882Z  WARN 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.b.s.consumer.MetricConsumerService     : Sending to DLQ: eventId=5a4af3f4-bde3-49d5-afe9-8dcd53df0817, reason=Unable to connect to Redis, type=PROCESSING_ERROR
+2026-03-01T02:21:46.882Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] .a.RecordMessagingMessageListenerAdapter : Processing [GenericMessage [payload=MetricEvent(eventId=11fac9d1-5c46-4e98-9971-12cf2e77bd65, timestamp=2026-03-01T02:21:46.879023884Z, serviceId=order-service, instanceId=order-service-pod-0, metricType=HTTP_REQUEST, metricName=api.request.duration, value=94.80501261767228, unit=milliseconds, tags={statusCode=287, method=PUT, endpoint=/api/v1/payments}, metadata={traceId=f45233c5-1c33-4214-99f2-65d114c3ddf7, spanId=be9760a8-cbe9-4e94-bec7-54d58ab45d58}), headers={kafka_offset=299, kafka_consumer=org.springframework.kafka.core.DefaultKafkaConsumerFactory$ExtendedKafkaConsumer@75434621, kafka_timestampType=CREATE_TIME, kafka_receivedPartitionId=0, kafka_receivedMessageKey=order-service, kafka_receivedTopic=metrics-events, kafka_receivedTimestamp=1772331706879, kafka_acknowledgment=Acknowledgment for metrics-events-0@299, kafka_groupId=streammetrics-processors}]]
+2026-03-01T02:21:46.882Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.b.s.consumer.MetricConsumerService     : Received metric: eventId=11fac9d1-5c46-4e98-9971-12cf2e77bd65, partition=0, offset=299
+2026-03-01T02:21:46.882Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.b.s.consumer.MetricConsumerService     : Processing with traceId: f45233c5-1c33-4214-99f2-65d114c3ddf7
+2026-03-01T02:21:46.882Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.b.s.processor.MetricProcessor          : Processing metric: eventId=11fac9d1-5c46-4e98-9971-12cf2e77bd65, serviceId=order-service, metricName=api.request.duration
+2026-03-01T02:21:46.883Z ERROR 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.b.s.consumer.MetricConsumerService     : Error processing metric: eventId=11fac9d1-5c46-4e98-9971-12cf2e77bd65
+
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.translateException(LettuceConnectionFactory.java:1868) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1799) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getNativeConnection(LettuceConnectionFactory.java:1596) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.lambda$getConnection$0(LettuceConnectionFactory.java:1576) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.doInLock(LettuceConnectionFactory.java:1537) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$SharedConnection.getConnection(LettuceConnectionFactory.java:1573) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getSharedConnection(LettuceConnectionFactory.java:1258) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory.getConnection(LettuceConnectionFactory.java:1054) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.RedisConnectionUtils.fetchConnection(RedisConnectionUtils.java:195) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.RedisConnectionUtils.doGetConnection(RedisConnectionUtils.java:144) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.RedisConnectionUtils.getConnection(RedisConnectionUtils.java:105) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:401) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.RedisTemplate.execute(RedisTemplate.java:381) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.AbstractOperations.execute(AbstractOperations.java:166) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.core.DefaultListOperations.rightPush(DefaultListOperations.java:211) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.backendbrilliance.streammetric.processor.MetricProcessor.processMetrics(MetricProcessor.java:27) ~[!/:0.0.1-SNAPSHOT]
+	at org.backendbrilliance.streammetric.consumer.MetricConsumerService.consumeMetric(MetricConsumerService.java:79) ~[!/:0.0.1-SNAPSHOT]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[na:na]
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:168) ~[spring-messaging-7.0.3.jar!/:7.0.3]
+	at org.springframework.kafka.listener.adapter.KotlinAwareInvocableHandlerMethod.doInvoke(KotlinAwareInvocableHandlerMethod.java:48) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.messaging.handler.invocation.InvocableHandlerMethod.invoke(InvocableHandlerMethod.java:119) ~[spring-messaging-7.0.3.jar!/:7.0.3]
+	at org.springframework.kafka.listener.adapter.HandlerAdapter.invoke(HandlerAdapter.java:80) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invokeHandler(MessagingMessageListenerAdapter.java:488) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.adapter.MessagingMessageListenerAdapter.invoke(MessagingMessageListenerAdapter.java:425) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:92) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.adapter.RecordMessagingMessageListenerAdapter.onMessage(RecordMessagingMessageListenerAdapter.java:52) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeOnMessage(KafkaMessageListenerContainer.java:2901) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeOnMessage(KafkaMessageListenerContainer.java:2880) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeRecordListener(KafkaMessageListenerContainer.java:2790) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.doInvokeWithRecords(KafkaMessageListenerContainer.java:2632) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeRecordListener(KafkaMessageListenerContainer.java:2526) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeListener(KafkaMessageListenerContainer.java:2164) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.invokeIfHaveRecords(KafkaMessageListenerContainer.java:1541) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.pollAndInvoke(KafkaMessageListenerContainer.java:1479) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at org.springframework.kafka.listener.KafkaMessageListenerContainer$ListenerConsumer.run(KafkaMessageListenerContainer.java:1348) ~[spring-kafka-4.0.2.jar!/:4.0.2]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(Unknown Source) ~[na:na]
+	at java.base/java.lang.Thread.run(Unknown Source) ~[na:na]
+Caused by: io.lettuce.core.RedisConnectionException: Unable to connect to localhost/<unresolved>:6379
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:63) ~[lettuce-core-6.8.2.RELEASE.jar!/:6.8.2.RELEASE/34f8700]
+	at io.lettuce.core.RedisConnectionException.create(RedisConnectionException.java:41) ~[lettuce-core-6.8.2.RELEASE.jar!/:6.8.2.RELEASE/34f8700]
+	at io.lettuce.core.AbstractRedisClient.getConnection(AbstractRedisClient.java:352) ~[lettuce-core-6.8.2.RELEASE.jar!/:6.8.2.RELEASE/34f8700]
+	at io.lettuce.core.RedisClient.connect(RedisClient.java:220) ~[lettuce-core-6.8.2.RELEASE.jar!/:6.8.2.RELEASE/34f8700]
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.lambda$getConnection$1(StandaloneConnectionProvider.java:113) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at java.base/java.util.Optional.orElseGet(Unknown Source) ~[na:na]
+	at org.springframework.data.redis.connection.lettuce.StandaloneConnectionProvider.getConnection(StandaloneConnectionProvider.java:113) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	at org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory$ExceptionTranslatingConnectionProvider.getConnection(LettuceConnectionFactory.java:1797) ~[spring-data-redis-4.0.2.jar!/:4.0.2]
+	... 36 common frames omitted
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: localhost/127.0.0.1:6379
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Unknown Source) ~[na:na]
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(Unknown Source) ~[na:na]
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:330) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:384) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.handle(AbstractNioChannel.java:432) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.NioIoHandler$DefaultNioRegistration.handle(NioIoHandler.java:388) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKey(NioIoHandler.java:596) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeysOptimized(NioIoHandler.java:571) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeys(NioIoHandler.java:512) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.nio.NioIoHandler.run(NioIoHandler.java:484) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.runIo(SingleThreadIoEventLoop.java:225) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:196) ~[netty-transport-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1195) ~[netty-common-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.2.9.Final.jar!/:4.2.9.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.2.9.Final.jar!/:4.2.9.Final]
+	at java.base/java.lang.Thread.run(Unknown Source) ~[na:na]
+
+2026-03-01T02:21:46.883Z  WARN 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.b.s.consumer.MetricConsumerService     : Sending to DLQ: eventId=11fac9d1-5c46-4e98-9971-12cf2e77bd65, reason=Unable to connect to Redis, type=PROCESSING_ERROR
+2026-03-01T02:21:46.883Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {metrics-events-0=OffsetAndMetadata{offset=300, leaderEpoch=null, metadata=''}}
+2026-03-01T02:21:46.883Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Committing: {metrics-events-0=OffsetAndMetadata{offset=300, leaderEpoch=null, metadata=''}}
+2026-03-01T02:21:46.890Z  INFO 1 --- [streammetrics-consumer] [umer-producer-1] o.b.s.consumer.MetricConsumerService     : Sent to DLQ: eventId=5a4af3f4-bde3-49d5-afe9-8dcd53df0817
+2026-03-01T02:21:46.890Z  INFO 1 --- [streammetrics-consumer] [umer-producer-1] o.b.s.consumer.MetricConsumerService     : Sent to DLQ: eventId=11fac9d1-5c46-4e98-9971-12cf2e77bd65
+2026-03-01T02:21:46.965Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:46.965Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:46.966Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:46.966Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:51.894Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:51.898Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:51.967Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:51.967Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:51.967Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:51.967Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:56.899Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:56.900Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:56.967Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:56.967Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:21:56.968Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:21:56.968Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:01.901Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:01.902Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:01.968Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:01.969Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:01.969Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:01.969Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:06.903Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:06.903Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:06.970Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:06.970Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:06.971Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:06.971Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:11.905Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:11.906Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:11.973Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:11.973Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:11.973Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:11.973Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:16.908Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:16.910Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:16.974Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:16.974Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:16.975Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:16.975Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:21.912Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:21.912Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:21.978Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:21.978Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:21.978Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:21.978Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:26.917Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:26.918Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:26.979Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:26.979Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:26.979Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:26.979Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:31.919Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:31.920Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:31.980Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:31.980Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:31.980Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:31.980Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:36.921Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:36.922Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:36.981Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:36.981Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:36.982Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:36.982Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:41.923Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:41.926Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:41.983Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:41.983Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:41.983Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:41.983Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:46.927Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:46.927Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:46.985Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:46.985Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:46.985Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:46.985Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:51.929Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:51.929Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:51.986Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:51.986Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:51.986Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:51.986Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:56.931Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:56.931Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:56.987Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:56.987Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:22:56.988Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:22:56.988Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:01.933Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:01.939Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:01.989Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:01.989Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:01.989Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:01.989Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:06.941Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:06.941Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:06.990Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:06.990Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:06.990Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:06.990Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:11.942Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:11.942Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:11.992Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:11.992Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:11.992Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:11.993Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:16.943Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:16.943Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:16.993Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:16.993Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:16.993Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:16.993Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:21.944Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:21.944Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:21.994Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:21.994Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Received: 0 records
+2026-03-01T02:23:21.994Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}
+2026-03-01T02:23:21.994Z DEBUG 1 --- [streammetrics-consumer] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : Commit list: {}

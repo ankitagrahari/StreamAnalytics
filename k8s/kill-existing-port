@@ -1,0 +1,8 @@
+# Find and kill the process
+lsof -ti:8085 | xargs kill -9
+
+# Or simpler - just use a different port
+kubectl port-forward -n streammetrics svc/producer 8086:8085 &
+
+# Test with new port
+curl "http://localhost:8086/produce?events=100"

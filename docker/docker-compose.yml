@@ -108,6 +108,90 @@ services:
     networks:
       - streammetrics-network
     command: redis-server --appendonly yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  producer:
+    image: streammetrics-producer:latest
+    pull_policy: never
+    container_name: streammetrics-producer
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19092,kafka3:19092
+      SPRING_REDIS_HOST: localhost
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8085
+      SPRING_DATA_REDIS_CLIENT_TYPE: lettuce
+      MANAGEMENT_HEALTH_REDIS_ENABLED: false
+    depends_on:
+      kafka1:
+        condition: service_started
+      kafka2:
+        condition: service_started
+      kafka3:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - streammetrics-network
+    restart: on-failure
+
+  consumer:
+    image: streammetric-consumer:latest
+    pull_policy: never
+    container_name: streammetric-consumer
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19092,kafka3:19092
+      SPRING_REDIS_HOST: localhost
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8081
+      SPRING_DATA_REDIS_CLIENT_TYPE: lettuce
+      MANAGEMENT_HEALTH_REDIS_ENABLED: false
+    depends_on:
+      kafka1:
+        condition: service_started
+      kafka2:
+        condition: service_started
+      kafka3:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - streammetrics-network
+    restart: on-failure
+
+  streams:
+    image: streammetric-streams:latest
+    pull_policy: never
+    container_name: streammetric-streams
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19092,kafka3:19092
+      SPRING_REDIS_HOST: localhost
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8082
+      SPRING_DATA_REDIS_CLIENT_TYPE: lettuce
+      MANAGEMENT_HEALTH_REDIS_ENABLED: false
+    depends_on:
+      kafka1:
+        condition: service_started
+      kafka2:
+        condition: service_started
+      kafka3:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    networks:
+      - streammetrics-network
+    restart: on-failure
 
   postgres:
     image: postgres:latest

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  producer:
+    image: streammetrics-producer:latest
+    container_name: streammetrics-producer
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19092,kafka3:19092
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8085
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - redis
+    networks:
+      - streammetrics-network
+    restart: unless-stopped
+
+  consumer:
+    image: streammetrics-consumer:latest
+    container_name: streammetrics-consumer
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19092,kafka3:19092
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8081
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - redis
+    networks:
+      - streammetrics-network
+    restart: unless-stopped
+
+  streams:
+    image: streammetrics-streams:latest
+    container_name: streammetrics-streams
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19092,kafka3:19092
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8082
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+      - redis
+    networks:
+      - streammetrics-network
+    restart: unless-stopped
+
+networks:
+  streammetrics-network:
+    name: streammetrics-network
