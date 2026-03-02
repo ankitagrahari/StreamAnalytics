@@ -1,20 +1,33 @@
 package org.backendbrilliance.streammetric.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import tools.jackson.databind.ObjectMapper;
+
 
 @Configuration
 public class RedisConfig {
 
-    private final ObjectMapper objectMapper;
+    @Value("${spring.redis.host:localhost}")
+    private String redisHost;
 
-    RedisConfig() {
-        objectMapper = new ObjectMapper();
+    @Value("${spring.redis.port:6379}")
+    private int redisPort;
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
+        config.setHostName(redisHost);  // Use injected value
+        config.setPort(redisPort);
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
@@ -26,9 +39,12 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
 
+        ObjectMapper objectMapper= new ObjectMapper();
+        objectMapper.registerModules(new JavaTimeModule());
+
         // Use JSON serializer for values
-        template.setValueSerializer(new GenericJacksonJsonRedisSerializer(objectMapper));
-        template.setHashValueSerializer(new GenericJacksonJsonRedisSerializer(objectMapper));
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
 
         template.afterPropertiesSet();
         return template;

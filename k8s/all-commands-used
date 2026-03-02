@@ -1,0 +1,173 @@
+---------Cluster Management---------
+# Start/stop minikube
+minikube start --cpus=4 --memory=8192
+minikube stop
+minikube delete
+
+# Check cluster
+kubectl cluster-info
+kubectl get nodes
+
+# Access dashboard
+minikube dashboard
+
+--------------------------------------
+-------Namespace Management:----------
+# Create namespace
+kubectl create namespace streammetrics
+
+# Set default namespace
+kubectl config set-context --current --namespace=streammetrics
+
+# List namespaces
+kubectl get namespaces
+--------------------------------------
+-------Resource Management (CRUD):----------
+# Create resources
+kubectl apply -f file.yaml
+kubectl create -f file.yaml
+
+# Read/View resources
+kubectl get pods
+kubectl get deployments
+kubectl get services
+kubectl get all
+kubectl get pods -l app=consumer  # Filter by label
+kubectl get pods -n streammetrics  # Specific namespace
+
+# Describe (detailed info)
+kubectl describe pod <pod-name>
+kubectl describe deployment <name>
+kubectl describe svc <service-name>
+
+# Delete resources
+kubectl delete pod <pod-name>
+kubectl delete deployment <name>
+kubectl delete -f file.yaml
+
+--------------------------------------
+-------Logs & Debugging:----------
+# View logs
+kubectl logs <pod-name>
+kubectl logs deployment/consumer
+kubectl logs -f deployment/consumer  # Follow/stream logs
+kubectl logs -l app=consumer  # Logs from all pods with label
+kubectl logs <pod-name> --tail=50  # Last 50 lines
+kubectl logs <pod-name> --since=1h  # Last hour
+
+# Execute commands in pod
+kubectl exec -it deployment/consumer -- sh
+kubectl exec deployment/redis -- redis-cli KEYS "*"
+kubectl exec deployment/consumer -- env | grep REDIS
+
+# Port forwarding (access service locally)
+kubectl port-forward svc/producer 8085:8085
+kubectl port-forward pod/<pod-name> 8080:8080
+
+
+--------------------------------------
+-------ConfigMaps & Secrets:----------
+# Create ConfigMap
+kubectl apply -f configmap.yaml
+kubectl create configmap myconfig --from-file=config.yml
+
+# View ConfigMap
+kubectl get configmap
+kubectl get configmap consumer-config -o yaml
+kubectl describe configmap consumer-config
+
+# Delete ConfigMap
+kubectl delete configmap consumer-config
+
+
+--------------------------------------
+-------Deployments & Rollouts:----------
+
+# Check deployment status
+kubectl rollout status deployment/consumer
+
+# Restart deployment (force pod recreation)
+kubectl rollout restart deployment/consumer
+
+# Scale deployment
+kubectl scale deployment/consumer --replicas=3
+
+# Update deployment
+kubectl set image deployment/consumer consumer=myapp:v2
+kubectl set env deployment/consumer REDIS_HOST=redis
+
+--------------------------------------
+-------Events & Troubleshooting:----------
+# Get recent events
+kubectl get events --sort-by='.lastTimestamp'
+kubectl get events -n streammetrics | tail -20
+
+# Check resource usage
+kubectl top nodes
+kubectl top pods
+
+# Check pod status details
+kubectl get pods -o wide
+kubectl get pods -o yaml
+kubectl get pods -o json | jq '.items[0].status'
+
+--------------------------------------
+-------CRDs (Custom Resource Definitions):----------
+
+# List CRDs
+kubectl get crd
+
+# Check Kafka resources (Strimzi)
+kubectl get kafka
+kubectl get kafkatopic
+kubectl get kafkanodepool
+
+# Describe custom resources
+kubectl describe kafka streammetrics-kafka
+
+--------------------------------------
+-------CRDs (Custom Resource Definitions):----------
+
+# List CRDs
+kubectl get crd
+
+# Check Kafka resources (Strimzi)
+kubectl get kafka
+kubectl get kafkatopic
+kubectl get kafkanodepool
+
+# Describe custom resources
+kubectl describe kafka streammetrics-kafka
+
+--------------------------------------
+-------Wait Commands:----------
+
+# Wait for condition
+kubectl wait pod -l app=redis --for=condition=ready --timeout=60s
+kubectl wait deployment/consumer --for=condition=Available --timeout=300s
+kubectl wait kafka/streammetrics-kafka --for=condition=Ready --timeout=600s
+
+
+--------------------------------------
+-------Service & Networking:----------
+
+# Get services
+kubectl get svc
+kubectl get endpoints
+
+# DNS testing
+kubectl exec deployment/consumer -- nslookup redis
+kubectl exec deployment/consumer -- nc -zv redis 6379
+
+--------------------------------------
+-------Context & Config:----------
+
+# View current context
+kubectl config current-context
+
+# View all contexts
+kubectl config get-contexts
+
+# Switch context
+kubectl config use-context minikube
+--------------------------------------

@@ -4,7 +4,7 @@ metadata:
   name: consumer
   namespace: streammetrics
 spec:
-  replicas: 2  # Scale to 2 instances
+  replicas: 1  # Scale to 2 instances
   selector:
     matchLabels:
       app: consumer
@@ -22,11 +22,12 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
+          readOnly: true
         env:
         - name: JAVA_TOOL_OPTIONS
           value: "-Dspring.redis.host=redis -Dspring.redis.port=6379"
         - name: SPRING_CONFIG_LOCATION
-          value: "classpath:/application.yml,/config/application.yml"
+          value: "classpath:/application.yml,file:/config/application.yml"
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
           value: "streammetrics-kafka-kafka-bootstrap:9092"
         - name: SPRING_REDIS_HOST

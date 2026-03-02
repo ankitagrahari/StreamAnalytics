@@ -6,10 +6,48 @@ metadata:
 data:
   application.yml: |
     spring:
-      kafka:
-        bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+      application:
+        name: streammetrics-consumer
       redis:
         host: redis
         port: 6379
+      kafka:
+        bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+        consumer:
+          group-id: streammetrics-processors
+          auto-offset-reset: earliest
+          enable-auto-commit: false
+          key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value-deserializer: org.backendbrilliance.streammetrics.serde.MetricEventDeserializer
+          max-poll-records: 500
+          max-poll-interval-ms: 300000
+          session-timeout-ms: 10000
+          heartbeat-interval-ms: 3000
+          isolation-level: read_committed
+      data:
+        redis:
+          client-type: lettuce
+    
+    management:
+      health:
+        redis:
+          enabled: false
+      endpoints:
+        web:
+          exposure:
+            include: health,info,metrics,prometheus
+    
     server:
       port: 8081
+    
+    app:
+      kafka:
+        topic:
+          metrics-events: metrics-events
+          metrics-dead-letter: metrics-dead-letter
+        consumer:
+          concurrency: 3
+    
+    logging:
+      level:
+        org.backendbrilliance: DEBUG

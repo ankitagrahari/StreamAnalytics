@@ -2,6 +2,9 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
+# Install required native libraries for RocksDB
+RUN apk add --no-cache libstdc++
+
 COPY streammetric-streams/target/streammetric-streams-0.0.1-SNAPSHOT.jar app.jar
 
 RUN addgroup -S spring && adduser -S spring -G spring

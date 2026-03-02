@@ -21,7 +21,7 @@ spec:
         - containerPort: 8082
         env:
         - name: SPRING_CONFIG_LOCATION
-          value: "classpath:/application.yml,/config/application.yml"  # ADD THIS
+          value: "classpath:/application.yml,/config/application.yml"
         - name: SPRING_DATA_REDIS_CLIENT_TYPE
           value: "lettuce"
         - name: MANAGEMENT_HEALTH_REDIS_ENABLED

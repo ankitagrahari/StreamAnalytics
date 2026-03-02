@@ -6,10 +6,42 @@ metadata:
 data:
   application.yml: |
     spring:
-      kafka:
-        bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+      application:
+        name: streammetrics-streams
       redis:
         host: redis
         port: 6379
+      kafka:
+        bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+        consumer:
+          bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092
+          group-id: aggregated-metric-store
+          auto-offset-reset: earliest
+          key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+          value-deserializer: org.backendbrilliance.streammetrics.serde.AggregatedMetricDeserializer
+        streams:
+          bootstrap-servers: streammetrics-kafka-kafka-bootstrap:9092        
+          application-id: streammetrics-aggregator
+          properties:
+            num.stream.threads: 2
+      data:
+        redis:
+          client-type: lettuce
+    
+    management:
+      health:
+        redis:
+          enabled: false
+    
     server:
       port: 8082
+    
+    app:
+      kafka:
+        topics:
+          input: metrics-events
+          output-1m: metrics-aggregated-1m
+    
+    logging:
+      level:
+        org.backendbrilliance: DEBUG
