@@ -68,6 +68,7 @@ management:
         enabled: true
     tags:
       application: ${spring.application.name}
+      environment: kubernetes
 
 logging:
   level:

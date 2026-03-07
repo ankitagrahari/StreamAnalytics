@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: producer-metrics
+  namespace: streammetrics
+  labels:
+    app: producer
+spec:
+  ports:
+    - name: metrics
+      port: 8085
+      targetPort: 8085
+  selector:
+    app: producer
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: producer-monitor
+  namespace: streammetrics
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: producer
+  endpoints:
+    - port: metrics
+      path: /actuator/prometheus
+      interval: 30s

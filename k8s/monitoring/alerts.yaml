@@ -1,0 +1,52 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: streammetrics-alerts
+  namespace: streammetrics
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: streammetrics
+      interval: 30s
+      rules:
+
+        # Alert: Consumer lag > 1000 messages
+        - alert: HighConsumerLag
+          expr: kafka_consumer_fetch_manager_records_lag_max{namespace="streammetrics"} > 1000
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Consumer lag is high"
+            description: "Consumer {{ $labels.pod }} has lag of {{ $value }} messages"
+
+        # Alert: Pod down
+        - alert: PodDown
+          expr: up{namespace="streammetrics"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod is down"
+            description: "{{ $labels.pod }} in {{ $labels.namespace }} is down"
+
+        # Alert: High memory usage
+        - alert: HighMemoryUsage
+          expr: (jvm_memory_used_bytes{area="heap",namespace="streammetrics"} / jvm_memory_max_bytes{area="heap",namespace="streammetrics"}) > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage"
+            description: "{{ $labels.pod }} is using {{ $value | humanizePercentage }} of heap"
+
+        # Alert: High error rate
+        - alert: HighErrorRate
+          expr: rate(http_server_requests_seconds_count{status=~"5..",namespace="streammetrics"}[5m]) > 0.1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High error rate"
+            description: "{{ $labels.uri }} has {{ $value }} errors/sec"
