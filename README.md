@@ -31,53 +31,35 @@ mvn clean install
 
 See `docs/architecture.md` for details.
 
+## Monitoring
 
-# StreamMetrics Monitoring
+StreamMetrics includes production-grade monitoring with Prometheus and Grafana.
 
-## Components
-
-- **Prometheus**: Metrics collection
-- **Grafana**: Visualization dashboards
-- **ServiceMonitors**: Auto-discovery of app metrics
-- **Alerts**: Consumer lag, pod health, memory alerts
-
-## Installation
+### Setup Monitoring
 ```bash
-# Install Prometheus Stack
+# Install Prometheus + Grafana
 helm install prometheus prometheus-community/kube-prometheus-stack \\
   --namespace monitoring \\
-  --create-namespace \\
-  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false \\
-  --set grafana.adminPassword=admin123
+  --create-namespace
 
 # Deploy ServiceMonitors
-kubectl apply -f servicemonitors/
+kubectl apply -f k8s/monitoring/servicemonitors/
 
-# Deploy Redis Exporter
-kubectl apply -f redis-exporter.yaml
-
-# Deploy Alerts
-kubectl apply -f alerts.yaml
-```
-
-## Access Grafana
-```bash
+# Access Grafana
 kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
-open http://localhost:3000
 # Login: admin / admin123
 ```
 
-## Import Dashboard
+### Dashboards
 
-1. In Grafana: Dashboards → Import
-2. Upload `dashboards/streammetrics-dashboard.json`
-3. Select Prometheus datasource
-4. Import
+Import `k8s/monitoring/dashboards/streammetrics-dashboard.json` in Grafana.
 
-## Key Metrics
+**Metrics included:**
+- JVM heap, CPU, garbage collection
+- HTTP request rate, latency (p95, p99)
+- Kafka producer throughput
+- Redis operations
+- Pod health status
 
-- **JVM Heap Usage**: `jvm_memory_used_bytes{area="heap"}`
-- **CPU Usage**: `rate(process_cpu_seconds_total[1m])`
-- **HTTP Requests/sec**: `rate(http_server_requests_seconds_count[1m])`
-- **Kafka Messages Sent**: `rate(spring_kafka_template_seconds_count[1m])`
-- **Redis Keys**: `redis_db_keys`
+See [k8s/monitoring/README.md](k8s/monitoring/README.md) for details.
+
